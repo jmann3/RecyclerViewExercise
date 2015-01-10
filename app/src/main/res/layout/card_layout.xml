@@ -5,6 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="120dp"
     card_view:cardCornerRadius="4dp"
+    card_view:cardUseCompatPadding="true"
+    card_view:cardElevation="20dp"
     android:layout_margin="5dp">
 
     <RelativeLayout
