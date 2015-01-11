@@ -1,5 +1,7 @@
 package com.isobar.jmann.recyclerviewdemo;
 
+import android.os.Handler;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,12 +20,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.zip.Inflater;
 
 
 public class MainActivity extends ActionBarActivity {
 
-    private List<PertinentInfo> infoList;
+    private List<PertinentInfo> mInfoList;
+    SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,11 +35,20 @@ public class MainActivity extends ActionBarActivity {
         RecyclerView recyclerView = (RecyclerView)findViewById(R.id.cardList);
         recyclerView.setHasFixedSize(true);
 
+        mSwipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.activity_main_swipe_refresh_layout);
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.orange, R.color.green, R.color.blue);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshContent();
+            }
+        });
+
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(llm);
 
-        infoList = new ArrayList<PertinentInfo>(createList(20));
+        mInfoList = new ArrayList<PertinentInfo>(createList(20));
 
         RecyclerViewDemoAdapter adapter = new RecyclerViewDemoAdapter();
         recyclerView.setAdapter(adapter);
@@ -82,6 +93,17 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void refreshContent() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // reset adapter .....
+
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
+        }, 2000);
     }
 
 
@@ -168,7 +190,7 @@ public class MainActivity extends ActionBarActivity {
         public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
 
             if (viewHolder instanceof ListItemViewHolder) {
-                PertinentInfo pertinentInfo = infoList.get(position - 1);
+                PertinentInfo pertinentInfo = mInfoList.get(position - 1);
                 ((ListItemViewHolder)viewHolder).item.setText(pertinentInfo.getItem());
                 ((ListItemViewHolder)viewHolder).time.setText(df.format(pertinentInfo.getTime()));
             } else if (viewHolder instanceof HeaderViewHolder) {
@@ -182,7 +204,7 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public int getItemCount() {
-            return infoList.size() + 2;
+            return mInfoList.size() + 2;
         }
 
         @Override
